@@ -1,5 +1,12 @@
+// ignore_for_file: unused_local_variable
+
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PaymentSuccessScreen extends StatefulWidget {
   final String ticketTitle;
@@ -19,6 +26,28 @@ class PaymentSuccessScreen extends StatefulWidget {
 
 class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
   bool _showDownloadAlert = false;
+
+  Future<void> downloadPDF() async {
+  const directory = "/storage/emulated/0/Download"; // Downloads folder
+  const filePath = "$directory/bukti-pembayaran.pdf";
+  const url = "https://mag.wcoomd.org/uploads/2018/05/blank.pdf";
+
+  log("File downloaded to $filePath");
+  try {
+    await Dio().download(url, filePath, 
+    onReceiveProgress: (received, total) {
+          if (total != -1) {
+            log('Progress: ${(received / total * 100).toStringAsFixed(0)}%');
+          }
+        },);
+    log("File downloaded to $filePath");
+    setState(() {
+      _showDownloadAlert = true;
+    });
+  } catch (e) {
+    log("Download failed: $e");
+  }
+}
   
   @override
   Widget build(BuildContext context) {
@@ -219,9 +248,7 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            setState(() {
-                              _showDownloadAlert = true;
-                            });
+                            downloadPDF();
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,

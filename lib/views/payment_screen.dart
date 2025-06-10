@@ -4,6 +4,9 @@ import 'package:app_ticketing/views/payment_success.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:app_ticketing/services/firebase_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:app_ticketing/views/payment_success.dart';
 
 class PaymentScreen extends StatefulWidget {
   final String title;
@@ -22,6 +25,7 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
+  final FirestoreService _firestoreService = FirestoreService();
   final formatter = NumberFormat('#,###', 'id_ID');
   final formattedDate = DateFormat('dd MMM yyyy').format(DateTime.now());
 
@@ -203,8 +207,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.0)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
           contentPadding: EdgeInsets.zero,
           content: Container(
             width: 300,
@@ -322,17 +326,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     style: TextStyle(fontSize: 14),
                   ),
                 ),
-              SizedBox(height: 16),
+               const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    // Tambahkan data pembayaran ke Firestore
+                    await _firestoreService.addPayment(
+                      title: widget.title,
+                      type: widget.type,
+                      price: widget.price,
+                    );
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                          builder: (context) => PaymentSuccessScreen(
-                            ticketTitle: widget.title,
-                            ticketPrice: widget.price,
-                            ticketType: widget.type,
-                          )),
+                        builder: (context) => PaymentSuccessScreen(
+                          ticketTitle: widget.title,
+                          ticketPrice: widget.price,
+                          ticketType: widget.type,
+                        ),
+                      ),
                     );
                   },
                   child: Text('Konfirmasi Pembayaran'),

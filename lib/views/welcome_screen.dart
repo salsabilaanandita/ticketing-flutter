@@ -58,7 +58,7 @@ class WelcomeScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
-                        builder: (context) => const TicketingScreen(),
+                        builder: (context) =>  TicketingScreen(),
                       ),
                     );
                   },
