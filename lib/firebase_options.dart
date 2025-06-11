@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -33,10 +30,7 @@ class DefaultFirebaseOptions {
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -65,4 +59,25 @@ class DefaultFirebaseOptions {
     storageBucket: 'ticketing-app-f5770.firebasestorage.app',
     iosBundleId: 'com.example.appTicketing',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyAWvakp8bhJuHgBCS8o4Br8vMIr-uuR8Xo',
+    appId: '1:802713114725:web:aca349b56225a38f75ce8c',
+    messagingSenderId: '802713114725',
+    projectId: 'ticketing-app-f5770',
+    authDomain: 'ticketing-app-f5770.firebaseapp.com',
+    storageBucket: 'ticketing-app-f5770.firebasestorage.app',
+    measurementId: 'G-NCSXBMX9SZ',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyAWvakp8bhJuHgBCS8o4Br8vMIr-uuR8Xo',
+    appId: '1:802713114725:web:ff739502e4ea640875ce8c',
+    messagingSenderId: '802713114725',
+    projectId: 'ticketing-app-f5770',
+    authDomain: 'ticketing-app-f5770.firebaseapp.com',
+    storageBucket: 'ticketing-app-f5770.firebasestorage.app',
+    measurementId: 'G-1PY9DJ9MS6',
+  );
+
 }

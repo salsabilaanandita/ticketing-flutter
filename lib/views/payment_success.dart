@@ -1,12 +1,17 @@
 // ignore_for_file: unused_local_variable
 
 import 'dart:developer';
+import 'dart:html' as html;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
-import 'package:dio/dio.dart';
+// import 'package:dio/dio.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/pdf.dart';
+
 
 class PaymentSuccessScreen extends StatefulWidget {
   final String ticketTitle;
@@ -28,25 +33,56 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
   bool _showDownloadAlert = false;
 
   Future<void> downloadPDF() async {
-  const directory = "/storage/emulated/0/Download"; // Downloads folder
-  const filePath = "$directory/bukti-pembayaran.pdf";
-  const url = "https://mag.wcoomd.org/uploads/2018/05/blank.pdf";
+  final pdf = pw.Document();
+  final formatter = NumberFormat('#,###', 'id_ID');
+  final String formattedPrice = formatter.format(widget.ticketPrice);
 
-  log("File downloaded to $filePath");
-  try {
-    await Dio().download(url, filePath, 
-    onReceiveProgress: (received, total) {
-          if (total != -1) {
-            log('Progress: ${(received / total * 100).toStringAsFixed(0)}%');
-          }
-        },);
-    log("File downloaded to $filePath");
+  pdf.addPage(
+    pw.Page(
+      build: (pw.Context context) => pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text('Bukti Pembayaran', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+          pw.SizedBox(height: 16),
+          pw.Text('Judul Tiket: ${widget.ticketTitle}'),
+          pw.Text('Tipe Tiket: ${widget.ticketType}'),
+          pw.Text('Harga: Rp. $formattedPrice'),
+          pw.Text('Status: LUNAS', style: pw.TextStyle(color: PdfColors.blue)),
+        ],
+      ),
+    ),
+  );
+
+  if (kIsWeb) {
+    // Untuk web: download sebagai blob
+    final bytes = await pdf.save();
+    final blob = html.Blob([bytes], 'application/pdf');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.AnchorElement(href: url)
+      ..setAttribute('download', 'bukti-pembayaran.pdf')
+      ..click();
+    html.Url.revokeObjectUrl(url);
     setState(() {
       _showDownloadAlert = true;
     });
-  } catch (e) {
-    log("Download failed: $e");
+    return;
   }
+
+  // Untuk Android/iOS: minta izin storage
+  if (await Permission.storage.request().isDenied) {
+    return;
+  }
+
+  // Simpan ke folder Download (Android)
+  final directory = Directory('/storage/emulated/0/Download');
+  final file = File('${directory.path}/bukti-pembayaran.pdf');
+  await file.writeAsBytes(await pdf.save());
+
+  setState(() {
+    _showDownloadAlert = true;
+  });
+
+  log("PDF saved to: ${file.path}");
 }
   
   @override

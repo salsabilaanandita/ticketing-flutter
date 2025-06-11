@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:app_ticketing/services/firebase_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:app_ticketing/views/payment_success.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:app_ticketing/views/payment_success.dart';
 
 class PaymentScreen extends StatefulWidget {
   final String title;
